@@ -1,6 +1,12 @@
 # Camel & Coin
 
-**▶ Play it: https://likhithaaralimara.github.io/camel-and-coin/**
+**▶ Play it: https://camel-and-coin.onrender.com**
+
+Everything lives on that one service — the page, the bots and the online rooms.
+There is also a static mirror at
+[likhithaaralimara.github.io/camel-and-coin](https://likhithaaralimara.github.io/camel-and-coin/)
+which loads instantly and never sleeps; it points at the same room server, so
+both URLs are the same game.
 
 A two-player Rajasthani trading card game, played in a browser — against a bot,
 or against a friend in a private room. Full rules, original artwork, heavy
@@ -184,23 +190,32 @@ who only plays bots never makes a network request.
 
 The game is two deployable things, and you can take either or both.
 
-**Static site (bot play).** Already live on GitHub Pages — `.github/workflows/pages.yml`
-runs the rule suite, builds, and publishes `public/` on every push to `main`.
-Asset paths are relative, so the same build works at a domain root or under a
-project subpath.
+**One service, everything (what's running now).** `render.yaml` deploys this repo
+as a single web service: it serves the page *and* the rooms. Online play needs a
+long-lived process holding state in memory with real WebSockets, which no
+serverless platform gives you — so the whole game lives together.
 
-Any other static host works too; `vercel.json` is set up for Vercel. The build
-emits `public/` and nothing else — no serverless functions, no backend.
+Serving the page from the same process has a nice side effect on a free tier
+that sleeps after 15 minutes idle: *loading the site is what wakes it*, so it's
+already warm by the time anyone clicks "Host a room".
 
 ```bash
-vercel --prod
+render services create --name camel-and-coin --type web_service \
+  --repo https://github.com/LikhithaAralimara/camel-and-coin --branch main \
+  --runtime node --region singapore --plan free \
+  --build-command "npm ci && npm run build" --start-command "node server.js" \
+  --health-check-path /api/rules --env-var ROOM_SERVER_URL=same-origin
 ```
 
-**Room server (online play).** Online rooms need a long-lived process holding
-state in memory and real WebSockets, which serverless platforms can't give you.
-`render.yaml` deploys this repo as a web service on Render's free tier; Railway
-and Fly work the same way with no code changes. That service is also a complete
-standalone deploy on its own — open it directly and everything works.
+**Static mirror (bot play).** `.github/workflows/pages.yml` runs the rule suite,
+builds, and publishes `public/` to GitHub Pages on every push to `main`. Asset
+paths are relative and invite links keep the directory, so the same build works
+at a domain root or under a project subpath. `vercel.json` is set up the same way
+for `vercel --prod`.
+
+A static host can serve the entire game against bots, because the engine, the bot
+and the room protocol all run inside the page. Set the `ROOM_SERVER_URL`
+repository variable to the room server's URL and it gets online play too.
 
 To point the static site at the room server, set one variable and redeploy — on
 GitHub Pages that's a repository variable named `ROOM_SERVER_URL` (Settings →
@@ -224,6 +239,14 @@ there says plainly that it can't be joined.
 
 Note that free tiers sleep when idle, so the first person to open a room after a
 quiet spell may wait up to a minute; the UI says as much instead of hanging.
+
+**Auto-deploy:** Render pushes deploys from a connected GitHub account. This
+service was created from the public Git URL, so until the repository is connected
+in the Render dashboard (Settings → *Connect GitHub*), deploy a new commit with:
+
+```bash
+render deploys create srv-dav5uch42hec73d3oag0 --confirm
+```
 
 **The server is authoritative.** Clients send actions, never state. Every outbound
 payload passes through `serializeFor(state, seat)` and `redactEvents(events, seat)`,
