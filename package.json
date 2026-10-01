@@ -1,0 +1,21 @@
+{
+  "name": "camel-and-coin",
+  "version": "1.0.0",
+  "description": "Camel & Coin \u2014 a two-player Rajasthani trading card game, with animated play against bots or friends over the network.",
+  "main": "server.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "start": "node scripts/build.js && node server.js",
+    "dev": "node scripts/build.js && node server.js",
+    "test": "node test/invariants.js 400"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "license": "MIT",
+  "private": true
+}

@@ -1,0 +1,15 @@
+# Always-on room server for online play. The static site on Vercel points at
+# this with ROOM_SERVER_URL; this service is also a complete standalone deploy
+# of the game on its own.
+services:
+  - type: web
+    name: camel-and-coin
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm install && npm run build
+    startCommand: node server.js
+    healthCheckPath: /api/rules
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
