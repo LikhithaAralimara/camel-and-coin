@@ -28,7 +28,15 @@ const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: '*' } });
 const rooms = new RoomManager(io);
 
-app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
+// Revalidate the client on every load. Without this a browser keeps yesterday's
+// JS after a deploy and quietly plays a different game from the server; with an
+// ETag the check costs a 304.
+app.use(express.static(path.join(__dirname, 'public'), {
+  extensions: ['html'],
+  setHeaders(res, filePath) {
+    if (/\.(html|js|css)$/i.test(filePath)) res.setHeader('Cache-Control', 'no-cache');
+  },
+}));
 app.use(express.json());
 
 // The page may be served from somewhere else entirely (a static host) while the
