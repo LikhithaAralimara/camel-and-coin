@@ -1,5 +1,7 @@
 # Camel & Coin
 
+**▶ Play it: https://likhithaaralimara.github.io/camel-and-coin/**
+
 A two-player Rajasthani trading card game, played in a browser — against a bot,
 or against a friend in a private room. Full rules, original artwork, heavy
 animation, and no framework.
@@ -182,9 +184,13 @@ who only plays bots never makes a network request.
 
 The game is two deployable things, and you can take either or both.
 
-**Static site (bot play).** Any static host works; `vercel.json` is set up for
-Vercel. The build emits `public/` and nothing else — no serverless functions, no
-backend.
+**Static site (bot play).** Already live on GitHub Pages — `.github/workflows/pages.yml`
+runs the rule suite, builds, and publishes `public/` on every push to `main`.
+Asset paths are relative, so the same build works at a domain root or under a
+project subpath.
+
+Any other static host works too; `vercel.json` is set up for Vercel. The build
+emits `public/` and nothing else — no serverless functions, no backend.
 
 ```bash
 vercel --prod
@@ -196,8 +202,9 @@ state in memory and real WebSockets, which serverless platforms can't give you.
 and Fly work the same way with no code changes. That service is also a complete
 standalone deploy on its own — open it directly and everything works.
 
-To point the static site at the room server, set one environment variable on the
-static host and redeploy:
+To point the static site at the room server, set one variable and redeploy — on
+GitHub Pages that's a repository variable named `ROOM_SERVER_URL` (Settings →
+Secrets and variables → Actions → Variables), on Vercel an environment variable:
 
 ```
 ROOM_SERVER_URL = https://<your-room-server>.onrender.com
