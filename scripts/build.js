@@ -10,13 +10,20 @@
  *   public/js/config.js        where the client should look for a room server.
  *
  * ROOM_SERVER_URL:
- *   unset, local        ""      the page's own origin (a normal `npm start`)
- *   unset, on Vercel    null    static deploy, no backend -> bot play only
- *   set                 <url>   e.g. https://camel-and-coin.onrender.com
+ *   unset, local          ""      the page's own origin (a normal `npm start`)
+ *   unset, on a static    null    no backend -> bot play only, and the menu
+ *     host (Vercel,               says so instead of failing on click
+ *     Pages, Netlify)
+ *   "same-origin"         ""      this deploy serves page and rooms together
+ *   <url>                 <url>   rooms live on another host
  */
 
 const fs = require('fs');
 const path = require('path');
+
+// A deploy that hosts the whole game — page and rooms together — sets
+// ROOM_SERVER_URL to this, which is clearer than relying on an empty string.
+const SAME_ORIGIN = 'same-origin';
 
 const ROOT = path.join(__dirname, '..');
 const OUT = path.join(ROOT, 'public', 'js');
@@ -52,11 +59,15 @@ function bundle() {
 
 function config() {
   const explicit = (process.env.ROOM_SERVER_URL || '').trim();
-  // Anywhere we are built for a static host, "no room server" is the right
-  // default — only a local run or the room server itself may claim its origin.
-  const staticHost = process.env.VERCEL || process.env.GITHUB_ACTIONS || process.env.CI;
+
+  // Named static hosts only. A generic CI=true would wrongly cover the room
+  // server's own build — the one deploy that *does* serve its own rooms.
+  const staticHost = process.env.VERCEL || process.env.GITHUB_ACTIONS
+    || process.env.NETLIFY || process.env.CF_PAGES;
+
   let value;
-  if (explicit) value = JSON.stringify(explicit.replace(/\/+$/, ''));
+  if (explicit === SAME_ORIGIN) value = '""';                 // "I serve my own rooms"
+  else if (explicit) value = JSON.stringify(explicit.replace(/\/+$/, ''));
   else if (staticHost) value = 'null';
   else value = '""';
 
@@ -71,8 +82,9 @@ fs.writeFileSync(path.join(OUT, 'core-bundle.js'), bundle());
 fs.writeFileSync(path.join(OUT, 'config.js'), config());
 
 const kb = (f) => (fs.statSync(path.join(OUT, f)).size / 1024).toFixed(1) + ' kB';
-const room = (process.env.ROOM_SERVER_URL || '').trim()
-  || ((process.env.VERCEL || process.env.GITHUB_ACTIONS || process.env.CI)
-    ? '(none — bot play only)' : '(this origin)');
+const chosen = JSON.parse(config().match(/= (.*);/)[1]);
+const room = chosen === null ? '(none — bot play only)'
+  : chosen === '' ? '(this origin — rooms served here)'
+  : chosen;
 console.log(`  core-bundle.js  ${kb('core-bundle.js')}  (${MODULES.join(', ')})`);
 console.log(`  config.js       ${kb('config.js')}  room server: ${room}`);

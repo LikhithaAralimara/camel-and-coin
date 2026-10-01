@@ -1,15 +1,22 @@
-# Always-on room server for online play. The static site on Vercel points at
-# this with ROOM_SERVER_URL; this service is also a complete standalone deploy
-# of the game on its own.
+# One host for the whole game: the page, the bots and the online rooms.
+#
+# Online rooms need a process that stays alive and holds state in memory, which
+# is why this exists and why a static host can't cover it. Serving the page from
+# the same service also means loading the site is what wakes it, so a free-tier
+# instance is already warm by the time anyone opens a room.
 services:
   - type: web
     name: camel-and-coin
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: node server.js
     healthCheckPath: /api/rules
+    autoDeployTrigger: commit
     envVars:
       - key: NODE_VERSION
         value: "22"
+      # This deploy serves its own rooms, so the client talks to its own origin.
+      - key: ROOM_SERVER_URL
+        value: same-origin

@@ -1,0 +1,38 @@
+[debug] [2026-10-01T13:07:47.473Z] ----------------------------------------------------------------------
+[debug] [2026-10-01T13:07:47.476Z] Command:       /opt/homebrew/Cellar/node/26.5.0/bin/node /usr/local/bin/firebase projects:list
+[debug] [2026-10-01T13:07:47.476Z] CLI Version:   14.8.0
+[debug] [2026-10-01T13:07:47.476Z] Platform:      darwin
+[debug] [2026-10-01T13:07:47.476Z] Node Version:  v26.5.0
+[debug] [2026-10-01T13:07:47.476Z] Time:          Thu Oct 01 2026 18:37:47 GMT+0530 (India Standard Time)
+[debug] [2026-10-01T13:07:47.476Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-10-01T13:07:47.477Z] >>> [apiv2][query] GET https://firebase-public.firebaseio.com/cli.json [none]
+[debug] [2026-10-01T13:07:47.501Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-10-01T13:07:47.501Z] > authorizing via signed-in user (likhitha@sensio-ai.in)
+[debug] [2026-10-01T13:07:47.502Z] Checked if tokens are valid: false, expires at: 1753372012329
+[debug] [2026-10-01T13:07:47.502Z] Checked if tokens are valid: false, expires at: 1753372012329
+[debug] [2026-10-01T13:07:47.502Z] > refreshing access token with scopes: []
+[debug] [2026-10-01T13:07:47.503Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-10-01T13:07:47.503Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-01T13:07:47.715Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-10-01T13:07:47.726Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-01T13:07:47.726Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2026-10-01T13:07:48.116Z] <<< [apiv2][status] GET https://firebase-public.firebaseio.com/cli.json 200
+[debug] [2026-10-01T13:07:48.116Z] <<< [apiv2][body] GET https://firebase-public.firebaseio.com/cli.json {"cloudBuildErrorAfter":1594252800000,"cloudBuildWarnAfter":1590019200000,"defaultNode10After":1594252800000,"minVersion":"3.0.5","node8DeploysDisabledAfter":1613390400000,"node8RuntimeDisabledAfter":1615809600000,"node8WarnAfter":1600128000000}
+[debug] [2026-10-01T13:07:49.036Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 401
+[debug] [2026-10-01T13:07:49.037Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2026-10-01T13:07:49.037Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2026-10-01T13:07:49.037Z] Checked if tokens are valid: false, expires at: 1753372012329
+[debug] [2026-10-01T13:07:49.037Z] Checked if tokens are valid: false, expires at: 1753372012329
+[debug] [2026-10-01T13:07:49.037Z] > refreshing access token with scopes: []
+[debug] [2026-10-01T13:07:49.038Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-10-01T13:07:49.038Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-01T13:07:49.108Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2026-10-01T13:07:49.109Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-10-01T13:07:49.111Z] Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=1000 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2026-10-01T13:07:49.114Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=1000 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at responseToError (/usr/local/lib/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/usr/local/lib/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.
