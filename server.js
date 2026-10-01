@@ -49,9 +49,25 @@ function lanAddress() {
   return null;
 }
 
-app.get('/api/net', (_req, res) => {
+app.get('/api/net', (req, res) => {
+  // Behind a host like Render the machine's own address is a private container
+  // IP, which would be useless advice. Trust the request's host instead.
+  const host = String(req.headers['x-forwarded-host'] || req.headers.host || '');
+  const proto = String(req.headers['x-forwarded-proto'] || req.protocol || 'http').split(',')[0];
+  const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(host);
+
+  if (host && !isLocal) {
+    return res.json({
+      publicUrl: `${proto}://${host}`,
+      lanUrl: null,
+      localUrl: null,
+      note: 'Send this link to anyone — they can join from any network.',
+    });
+  }
+
   const lan = lanAddress();
   res.json({
+    publicUrl: null,
     lanUrl: lan ? `http://${lan}:${PORT}` : null,
     localUrl: `http://localhost:${PORT}`,
     note: lan
