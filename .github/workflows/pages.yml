@@ -1,0 +1,59 @@
+# Publishes the static build to GitHub Pages.
+#
+# Pages can serve the whole game against bots, because the engine, the bot and
+# the room protocol all run inside the page. It cannot host online rooms — those
+# need a long-lived process — so ROOM_SERVER_URL is left unset here and the menu
+# says so. Point it at an always-on server (see render.yaml) to enable them.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Check the rules still hold
+        run: npm test
+
+      - name: Build the static site
+        run: node scripts/build.js
+        env:
+          # unset => no room server; the menu offers bot play and explains why.
+          ROOM_SERVER_URL: ${{ vars.ROOM_SERVER_URL }}
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
