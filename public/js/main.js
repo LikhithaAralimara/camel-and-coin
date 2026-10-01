@@ -196,9 +196,12 @@
 
   function paintInvite() {
     if (!state.code) return;
+    // Keep the directory: served from a project subpath (GitHub Pages), an
+    // origin-only link would drop /camel-and-coin/ and 404 for the invitee.
+    const dir = location.pathname.replace(/[^/]*$/, '');
     const base = (netInfo && netInfo.lanUrl && location.hostname === 'localhost')
       ? netInfo.lanUrl : location.origin;
-    $('#inviteLink').value = `${base}/?room=${state.code}`;
+    $('#inviteLink').value = `${base}${dir}?room=${state.code}`;
     $('#netNote').textContent = (netInfo && netInfo.note) || '';
   }
 
